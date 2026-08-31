@@ -19,10 +19,9 @@ Config.ImageMaxWidth = 900
 Config.ImageMinWidth = 460
 
 -- Position du nombre du compte à rebours dans le PNG.
--- Le nombre est placé juste après le mot "dans" et garde une taille proche
--- de celle du texte inférieur de l'interface.
-Config.CountdownX = 0.635
-Config.CountdownY = 0.58
+-- Réglé pour apparaître directement à droite de "Vous allez réapparaitre dans".
+Config.CountdownX = 0.590
+Config.CountdownY = 0.595
 
 -- Taille du compteur, relative à la hauteur de l'écran.
 Config.CountdownFontScale = 0.019
