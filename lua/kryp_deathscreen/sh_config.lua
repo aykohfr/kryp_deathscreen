@@ -11,22 +11,27 @@ Config.UseDarkRPRespawnTime = false
 
 -- Fond de l'écran de mort.
 -- 0 = invisible, 255 = noir complet.
-Config.BackgroundAlpha = 232
+Config.BackgroundAlpha = 238
 
 -- Interface compacte.
-Config.PanelWidth = 540
-Config.PanelHeight = 220
-Config.PanelMinWidth = 420
-Config.PanelMaxWidth = 600
-Config.PanelScreenWidth = 0.34
+Config.PanelWidth = 620
+Config.PanelHeight = 245
+Config.PanelMinWidth = 460
+Config.PanelMaxWidth = 700
+Config.PanelScreenWidth = 0.40
+Config.PanelRadius = 14
 
--- Couleurs : inspiration SCP discrète, sans surcharger les textes.
-Config.AccentColor = Color(172, 42, 42)
-Config.AccentSoftColor = Color(94, 28, 28)
-Config.PanelColor = Color(10, 11, 13, 244)
-Config.PanelInnerColor = Color(18, 19, 22, 238)
-Config.TextColor = Color(240, 241, 243)
-Config.MutedTextColor = Color(151, 155, 161)
+-- Couleurs.
+Config.AccentColor = Color(188, 48, 48)
+Config.AccentSoftColor = Color(102, 27, 27)
+Config.AccentGlowColor = Color(215, 64, 64)
+
+Config.PanelColor = Color(10, 11, 13, 245)
+Config.PanelInnerColor = Color(17, 19, 22, 240)
+Config.PanelInnerSoftColor = Color(24, 26, 30, 220)
+
+Config.TextColor = Color(242, 243, 245)
+Config.MutedTextColor = Color(155, 160, 168)
 
 -- Animations.
 Config.FadeInDuration = 0.42
@@ -36,12 +41,12 @@ Config.EndScale = 1.025
 
 -- Effet du monde derrière l'UI.
 Config.EnableWorldEffect = true
-Config.WorldEffectStrength = 0.78
+Config.WorldEffectStrength = 0.82
 
--- Textes simples.
+-- Textes.
 Config.DeathTitle = "Vous êtes mort.."
-Config.DeathSubtitlePrefix = "Vous allez réapparaitre dans "
-Config.DeathSubtitleSuffix = " secondes.."
+Config.DeathSubtitlePrefix = "Vous allez réapparaitre dans"
+Config.DeathSubtitleSuffix = "secondes.."
 Config.ReadyMessage = "APPUYEZ SUR UNE TOUCHE"
 Config.CreditText = "Réalisateur : Kryp Studio"
 
