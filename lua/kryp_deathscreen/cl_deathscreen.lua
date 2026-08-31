@@ -172,18 +172,17 @@ hook.Add("HUDPaint", "KrypDeathScreen.Draw", function()
         surface.SetMaterial(deathMaterial)
         surface.DrawTexturedRect(x, y, w, h)
 
-        -- Le compteur est volontairement de la même échelle visuelle que
-        -- la ligne "Vous allez réapparaitre dans" du PNG et placé juste après "dans".
+        -- Le texte dynamique commence juste après "dans" dans le PNG.
         local countdownX = x + (w * Config.CountdownX)
         local countdownY = y + (h * Config.CountdownY)
 
         draw.SimpleText(
-            tostring(remaining),
+            tostring(remaining) .. " secondes",
             "KrypDeathScreen.Countdown",
             countdownX,
             countdownY,
             Color(255, 255, 255, 255 * alpha),
-            TEXT_ALIGN_CENTER,
+            TEXT_ALIGN_LEFT,
             TEXT_ALIGN_CENTER
         )
     else
