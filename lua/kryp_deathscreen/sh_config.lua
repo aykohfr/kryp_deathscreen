@@ -18,11 +18,20 @@ Config.ImageScreenWidth = 0.46
 Config.ImageMaxWidth = 900
 Config.ImageMinWidth = 460
 
--- Position du nombre du compte à rebours DANS l'image.
--- 0.50 = centre horizontal, 0.50 = centre vertical.
--- Ajuste ces deux valeurs si ton PNG change légèrement.
-Config.CountdownX = 0.50
+-- Position du nombre du compte à rebours dans le PNG.
+-- Le nombre est placé juste après le mot "dans" et garde une taille proche
+-- de celle du texte inférieur de l'interface.
+Config.CountdownX = 0.635
 Config.CountdownY = 0.58
+
+-- Taille du compteur, relative à la hauteur de l'écran.
+Config.CountdownFontScale = 0.019
+Config.CountdownFontMin = 18
+Config.CountdownFontMax = 30
+
+-- Fond sombre derrière l'interface.
+-- 0 = invisible, 255 = noir complet.
+Config.BackgroundAlpha = 155
 
 -- Décalage vertical du message affiché lorsque le timer est terminé.
 Config.ReadyMessageOffset = 42
@@ -35,7 +44,7 @@ Config.EndScale = 1.035
 
 -- Effet visuel sur le monde pendant la mort.
 Config.EnableWorldEffect = true
-Config.WorldEffectStrength = 0.82
+Config.WorldEffectStrength = 0.58
 
 -- Textes
 Config.ReadyMessage = "Merci de cliquer sur une touche pour réapparaitre"
