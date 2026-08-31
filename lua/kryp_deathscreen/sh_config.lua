@@ -3,52 +3,49 @@ KrypDeathScreen.Config = KrypDeathScreen.Config or {}
 
 local Config = KrypDeathScreen.Config
 
--- UI distante
-Config.ImageURL = "https://i.imgur.com/Ba5xCtK.png"
-Config.CacheFile = "kryp_deathscreen/deathscreen_ba5xctk.png"
-
 -- Temps avant de pouvoir réapparaitre.
 Config.RespawnDelay = 45
 
 -- Si activé, utilise GAMEMODE.Config.respawntime quand DarkRP le fournit.
 Config.UseDarkRPRespawnTime = false
 
--- Taille de l'image à l'écran.
-Config.ImageScreenWidth = 0.46
-Config.ImageMaxWidth = 900
-Config.ImageMinWidth = 460
-
--- Position du nombre du compte à rebours dans le PNG.
--- Réglé pour apparaître directement à droite de "Vous allez réapparaitre dans".
-Config.CountdownX = 0.590
-Config.CountdownY = 0.595
-
--- Taille du compteur, relative à la hauteur de l'écran.
-Config.CountdownFontScale = 0.019
-Config.CountdownFontMin = 18
-Config.CountdownFontMax = 30
-
--- Fond sombre derrière l'interface.
+-- Fond de l'écran de mort.
 -- 0 = invisible, 255 = noir complet.
-Config.BackgroundAlpha = 155
+Config.BackgroundAlpha = 218
 
--- Décalage vertical du message affiché lorsque le timer est terminé.
-Config.ReadyMessageOffset = 42
+-- Interface SCP compacte.
+Config.PanelWidth = 560
+Config.PanelHeight = 250
+Config.PanelMinWidth = 430
+Config.PanelMaxWidth = 620
+Config.PanelScreenWidth = 0.36
 
--- Animations
-Config.FadeInDuration = 0.38
-Config.FadeOutDuration = 0.34
-Config.StartScale = 0.94
-Config.EndScale = 1.035
+-- Couleurs.
+Config.AccentColor = Color(177, 45, 45)
+Config.AccentSoftColor = Color(120, 34, 34)
+Config.PanelColor = Color(13, 15, 17, 242)
+Config.PanelInnerColor = Color(20, 22, 24, 238)
+Config.TextColor = Color(236, 238, 240)
+Config.MutedTextColor = Color(145, 151, 158)
 
--- Effet visuel sur le monde pendant la mort.
+-- Animations.
+Config.FadeInDuration = 0.42
+Config.FadeOutDuration = 0.32
+Config.StartScale = 0.96
+Config.EndScale = 1.025
+
+-- Effet du monde derrière l'UI.
 Config.EnableWorldEffect = true
-Config.WorldEffectStrength = 0.58
+Config.WorldEffectStrength = 0.72
 
--- Textes
-Config.ReadyMessage = "Merci de cliquer sur une touche pour réapparaitre"
+-- Textes.
+Config.HeaderText = "SCP FOUNDATION // MEDICAL PROTOCOL"
+Config.DeathTitle = "PERSONNEL DÉCÉDÉ"
+Config.DeathSubtitle = "RÉANIMATION AUTORISÉE DANS"
+Config.ReadyMessage = "AUTORISATION ACCORDÉE — APPUYEZ SUR UNE TOUCHE"
+Config.FooterText = "SECURE • CONTAIN • PROTECT"
 
--- Réseau
+-- Réseau.
 KrypDeathScreen.Net = KrypDeathScreen.Net or {
     Start = "KrypDeathScreen.Start",
     Stop = "KrypDeathScreen.Stop",
