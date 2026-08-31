@@ -21,7 +21,11 @@ local state = {
 local function createFonts()
     surface.CreateFont("KrypDeathScreen.Countdown", {
         font = "Roboto",
-        size = math.Clamp(math.floor(ScrH() * 0.036), 28, 52),
+        size = math.Clamp(
+            math.floor(ScrH() * (Config.CountdownFontScale or 0.019)),
+            Config.CountdownFontMin or 18,
+            Config.CountdownFontMax or 30
+        ),
         weight = 800,
         antialias = true
     })
@@ -154,6 +158,12 @@ hook.Add("HUDPaint", "KrypDeathScreen.Draw", function()
     local alpha, scaleAnimation = getAnimation()
     if alpha <= 0 then return end
 
+    -- Voile noir semi-transparent : le jeu reste visible en arrière-plan,
+    -- mais l'interface de mort ressort nettement mieux.
+    local backgroundAlpha = math.Clamp((Config.BackgroundAlpha or 155) * alpha, 0, 255)
+    surface.SetDrawColor(0, 0, 0, backgroundAlpha)
+    surface.DrawRect(0, 0, ScrW(), ScrH())
+
     local x, y, w, h = getImageRect(scaleAnimation)
     local remaining = math.max(0, math.ceil(state.readyAt - CurTime()))
 
@@ -162,6 +172,8 @@ hook.Add("HUDPaint", "KrypDeathScreen.Draw", function()
         surface.SetMaterial(deathMaterial)
         surface.DrawTexturedRect(x, y, w, h)
 
+        -- Le compteur est volontairement de la même échelle visuelle que
+        -- la ligne "Vous allez réapparaitre dans" du PNG et placé juste après "dans".
         local countdownX = x + (w * Config.CountdownX)
         local countdownY = y + (h * Config.CountdownY)
 
@@ -203,9 +215,9 @@ hook.Add("RenderScreenspaceEffects", "KrypDeathScreen.WorldEffect", function()
         ["$pp_colour_addr"] = 0,
         ["$pp_colour_addg"] = 0,
         ["$pp_colour_addb"] = 0,
-        ["$pp_colour_brightness"] = -0.055 * alpha,
-        ["$pp_colour_contrast"] = 1 - (0.16 * alpha),
-        ["$pp_colour_colour"] = 1 - (0.76 * alpha),
+        ["$pp_colour_brightness"] = -0.035 * alpha,
+        ["$pp_colour_contrast"] = 1 - (0.10 * alpha),
+        ["$pp_colour_colour"] = 1 - (0.52 * alpha),
         ["$pp_colour_mulr"] = 0,
         ["$pp_colour_mulg"] = 0,
         ["$pp_colour_mulb"] = 0
