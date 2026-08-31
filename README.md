@@ -1,18 +1,18 @@
 # Kryp Deathscreen
 
-Deathscreen Garry's Mod / DarkRP avec UI distante Imgur, compte à rebours serveur et respawn manuel.
+Deathscreen Garry's Mod / DarkRP entièrement dessiné en Lua, avec une interface compacte inspirée de l'univers SCP, compte à rebours serveur et respawn manuel.
 
 ## Fonctionnement
 
-- Affiche l'UI `https://i.imgur.com/Ba5xCtK.png` à la mort du joueur.
-- Télécharge et met en cache le PNG côté client dans `garrysmod/data/kryp_deathscreen/`.
-- Affiche le temps restant dans l'espace prévu après « Dans ».
+- Aucune image distante et aucune dépendance Imgur.
+- Interface SCP native dessinée directement avec le HUD Garry's Mod.
+- Fond fortement assombri tout en laissant le monde légèrement visible.
+- Compte à rebours synchronisé avec le serveur.
 - Bloque le respawn natif pendant le compte à rebours.
-- Quand le délai est terminé, affiche : `Merci de cliquer sur une touche pour réapparaitre`.
-- Une touche clavier déclenche alors la demande de respawn.
+- À la fin du délai, affiche une autorisation de réanimation et demande d'appuyer sur une touche.
 - Le serveur revalide le délai avant d'autoriser le respawn.
 - Animation d'entrée à la mort et animation de sortie au respawn.
-- Effet visuel léger sur le monde pendant la mort.
+- Effet de désaturation et d'assombrissement du monde.
 
 ## Installation
 
@@ -40,14 +40,13 @@ Tout se règle dans :
 lua/kryp_deathscreen/sh_config.lua
 ```
 
-Le délai par défaut est de **45 secondes**. Tu peux aussi activer l'utilisation du `respawntime` DarkRP.
+Le délai par défaut est de **45 secondes**.
 
-Les positions `CountdownX` et `CountdownY` sont exprimées en pourcentage de l'image et permettent d'ajuster très précisément le nombre dans l'espace entre « Dans » et « Secondes ».
+Paramètres principaux :
 
-## Commande client
-
-```text
-kryp_deathscreen_refresh
-```
-
-Supprime le cache local du PNG et le retélécharge depuis Imgur.
+- `BackgroundAlpha` : intensité du fond noir.
+- `PanelScreenWidth` : largeur de la carte SCP.
+- `AccentColor` : couleur principale de l'interface.
+- `FadeInDuration` / `FadeOutDuration` : vitesse des animations.
+- `WorldEffectStrength` : force de l'effet appliqué au monde.
+- `UseDarkRPRespawnTime` : utilise le temps de respawn DarkRP lorsqu'il est disponible.
