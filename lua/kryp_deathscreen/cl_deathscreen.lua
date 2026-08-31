@@ -17,32 +17,31 @@ local state = {
 local function createFonts()
     local h = ScrH()
 
+    surface.CreateFont("KrypDeathScreen.Small", {
+        font = "Roboto",
+        size = math.Clamp(math.floor(h * 0.0135), 14, 22),
+        weight = 500,
+        antialias = true,
+        extended = true
+    })
+
     surface.CreateFont("KrypDeathScreen.Title", {
         font = "Roboto",
-        size = math.Clamp(math.floor(h * 0.050), 40, 74),
-        weight = 900,
+        size = math.Clamp(math.floor(h * 0.050), 42, 76),
+        weight = 1000,
         antialias = true,
         extended = true
     })
 
     surface.CreateFont("KrypDeathScreen.Subtitle", {
         font = "Roboto",
-        size = math.Clamp(math.floor(h * 0.018), 18, 28),
-        weight = 500,
-        antialias = true,
-        extended = true,
-        italic = true
-    })
-
-    surface.CreateFont("KrypDeathScreen.Countdown", {
-        font = "Roboto",
-        size = math.Clamp(math.floor(h * 0.019), 19, 30),
-        weight = 800,
+        size = math.Clamp(math.floor(h * 0.020), 20, 32),
+        weight = 600,
         antialias = true,
         extended = true
     })
 
-    surface.CreateFont("KrypDeathScreen.Ready", {
+    surface.CreateFont("KrypDeathScreen.Countdown", {
         font = "Roboto",
         size = math.Clamp(math.floor(h * 0.020), 20, 32),
         weight = 900,
@@ -50,10 +49,18 @@ local function createFonts()
         extended = true
     })
 
+    surface.CreateFont("KrypDeathScreen.Ready", {
+        font = "Roboto",
+        size = math.Clamp(math.floor(h * 0.021), 21, 34),
+        weight = 900,
+        antialias = true,
+        extended = true
+    })
+
     surface.CreateFont("KrypDeathScreen.Credit", {
         font = "Roboto",
-        size = math.Clamp(math.floor(h * 0.0115), 12, 18),
-        weight = 500,
+        size = math.Clamp(math.floor(h * 0.011), 11, 16),
+        weight = 400,
         antialias = true,
         extended = true
     })
@@ -62,45 +69,34 @@ end
 createFonts()
 hook.Add("OnScreenSizeChanged", "KrypDeathScreen.Fonts", createFonts)
 
-local function clamp01(v)
-    return math.Clamp(v, 0, 1)
+local function clamp01(value)
+    return math.Clamp(value, 0, 1)
 end
 
-local function easeOutCubic(v)
-    v = clamp01(v)
-    return 1 - ((1 - v) ^ 3)
-end
-
-local function withAlpha(col, alpha)
-    return Color(col.r, col.g, col.b, math.Clamp((col.a or 255) * alpha, 0, 255))
+local function easeOutCubic(value)
+    value = clamp01(value)
+    return 1 - ((1 - value) ^ 3)
 end
 
 local function getAnimation()
     if state.leaving then
-        local duration = math.max(Config.FadeOutDuration or 0.30, 0.01)
-        local p = easeOutCubic((RealTime() - state.leaveAt) / duration)
-        return 1 - p, Lerp(p, 1, Config.EndScale or 1.015)
+        local duration = math.max(Config.FadeOutDuration or 0.32, 0.01)
+        local progress = easeOutCubic((RealTime() - state.leaveAt) / duration)
+        return 1 - progress, Lerp(progress, 1, Config.EndScale or 1.02)
     end
 
-    local duration = math.max(Config.FadeInDuration or 0.40, 0.01)
-    local p = easeOutCubic((RealTime() - state.startedAt) / duration)
-    return p, Lerp(p, Config.StartScale or 0.97, 1)
+    local duration = math.max(Config.FadeInDuration or 0.42, 0.01)
+    local progress = easeOutCubic((RealTime() - state.startedAt) / duration)
+    return progress, Lerp(progress, Config.StartScale or 0.97, 1)
 end
 
-local function getContentRect(scaleAnimation)
-    local baseW = math.Clamp(
-        ScrW() * (Config.ContentScreenWidth or 0.46),
-        Config.ContentMinWidth or 520,
-        Config.ContentMaxWidth or 820
+local function withAlpha(color, alpha)
+    return Color(
+        color.r,
+        color.g,
+        color.b,
+        math.Clamp((color.a or 255) * alpha, 0, 255)
     )
-
-    local refW = Config.ContentWidth or 720
-    local baseH = (Config.ContentHeight or 230) * (baseW / refW)
-
-    local w = baseW * scaleAnimation
-    local h = baseH * scaleAnimation
-
-    return (ScrW() - w) * 0.5, (ScrH() - h) * 0.5, w, h
 end
 
 local function measureText(font, text)
@@ -108,86 +104,144 @@ local function measureText(font, text)
     return surface.GetTextSize(text)
 end
 
-local function drawSoftGlow(x, y, w, h, radius, color, alpha)
-    for i = 6, 1, -1 do
-        local grow = i * 3
-        local strength = alpha / (i * 1.7)
-        draw.RoundedBox(radius + grow, x - grow, y - grow, w + grow * 2, h + grow * 2, Color(color.r, color.g, color.b, strength))
-    end
+local function drawGlowText(text, font, x, y, color, alpha, xalign, yalign)
+    local glow = withAlpha(Config.GlowColor or Color(255, 255, 255), alpha * 0.16)
+
+    draw.SimpleText(text, font, x + 1, y, glow, xalign, yalign)
+    draw.SimpleText(text, font, x - 1, y, glow, xalign, yalign)
+    draw.SimpleText(text, font, x, y + 1, glow, xalign, yalign)
+    draw.SimpleText(text, font, x, y - 1, glow, xalign, yalign)
+    draw.SimpleText(text, font, x, y, withAlpha(color, alpha), xalign, yalign)
 end
 
-local function drawCountdownLine(cx, y, alpha, remaining)
-    local prefix = Config.DeathSubtitlePrefix or "Vous allez réapparaitre dans "
-    local suffix = Config.DeathSubtitleSuffix or " secondes.."
-    local number = tostring(remaining)
+local function drawSoftBox(x, y, w, h, radius, alpha)
+    for i = 8, 1, -1 do
+        local grow = i * 4
+        draw.RoundedBox(
+            radius + grow,
+            x - grow,
+            y - grow,
+            w + (grow * 2),
+            h + (grow * 2),
+            Color(0, 0, 0, (7 * alpha) / i)
+        )
+    end
+
+    draw.RoundedBox(radius, x, y, w, h, withAlpha(Config.PanelColor or Color(8, 8, 10, 185), alpha))
+    draw.RoundedBox(radius - 2, x + 2, y + 2, w - 4, h - 4, withAlpha(Config.PanelSoftColor or Color(16, 16, 20, 160), alpha * 0.85))
+end
+
+local function getPanelRect(scaleAnimation)
+    local baseW = math.Clamp(
+        ScrW() * (Config.PanelScreenWidth or 0.52),
+        Config.PanelMinWidth or 520,
+        Config.PanelMaxWidth or 860
+    )
+
+    local refW = Config.PanelWidth or 760
+    local refH = Config.PanelHeight or 250
+    local baseH = refH * (baseW / refW)
+
+    local w = baseW * scaleAnimation
+    local h = baseH * scaleAnimation
+
+    return (ScrW() - w) * 0.5, (ScrH() - h) * 0.5, w, h
+end
+
+local function drawRespawnLine(x, y, w, h, alpha, remaining)
+    local prefix = Config.DeathSubtitlePrefix or "Vous allez réapparaitre dans"
+    local suffix = Config.DeathSubtitleSuffix or "secondes.."
+    local countText = tostring(remaining)
 
     local prefixW = measureText("KrypDeathScreen.Subtitle", prefix)
-    local numberW = measureText("KrypDeathScreen.Countdown", number)
+    local countW = measureText("KrypDeathScreen.Countdown", countText)
     local suffixW = measureText("KrypDeathScreen.Subtitle", suffix)
-    local gap = 6
-    local total = prefixW + numberW + suffixW + gap * 2
-    local x = cx - total * 0.5
 
-    draw.SimpleText(prefix, "KrypDeathScreen.Subtitle", x, y, withAlpha(Config.TextColor or color_white, alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-    x = x + prefixW + gap
+    local gap = math.max(10, math.floor(w * 0.012))
+    local totalW = prefixW + gap + countW + gap + suffixW
 
-    draw.SimpleText(number, "KrypDeathScreen.Countdown", x, y, withAlpha(Config.AccentColor or Color(232, 92, 36), alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-    x = x + numberW + gap
+    local startX = x + (w * 0.5) - (totalW * 0.5)
+    local centerY = y + (h * 0.66)
 
-    draw.SimpleText(suffix, "KrypDeathScreen.Subtitle", x, y, withAlpha(Config.TextColor or color_white, alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+    drawGlowText(
+        prefix,
+        "KrypDeathScreen.Subtitle",
+        startX,
+        centerY,
+        Config.MutedTextColor or Color(220, 220, 220),
+        alpha,
+        TEXT_ALIGN_LEFT,
+        TEXT_ALIGN_CENTER
+    )
+
+    drawGlowText(
+        countText,
+        "KrypDeathScreen.Countdown",
+        startX + prefixW + gap,
+        centerY,
+        Config.TextColor or Color(255, 255, 255),
+        alpha,
+        TEXT_ALIGN_LEFT,
+        TEXT_ALIGN_CENTER
+    )
+
+    drawGlowText(
+        suffix,
+        "KrypDeathScreen.Subtitle",
+        startX + prefixW + gap + countW + gap,
+        centerY,
+        Config.MutedTextColor or Color(220, 220, 220),
+        alpha,
+        TEXT_ALIGN_LEFT,
+        TEXT_ALIGN_CENTER
+    )
 end
 
-local function drawDeathContent(alpha, scaleAnimation, remaining)
-    local x, y, w, h = getContentRect(scaleAnimation)
-    local radius = Config.ContentRadius or 16
-    local accent = Config.AccentColor or Color(232, 92, 36)
-    local glow = Config.AccentGlowColor or Color(255, 112, 48)
-    local text = Config.TextColor or Color(248, 248, 248)
-    local muted = Config.MutedTextColor or Color(205, 205, 210)
+local function drawReadyLine(x, y, w, h, alpha)
+    local pulse = 0.88 + math.sin(RealTime() * 5.0) * 0.08
 
-    -- Zone sombre centrale sans cadre visible.
-    drawSoftGlow(x, y, w, h, radius, glow, 18 * alpha)
-    draw.RoundedBox(radius, x, y, w, h, Color(0, 0, 0, (Config.ContentAlpha or 118) * alpha))
+    drawGlowText(
+        Config.ReadyMessage or "APPUYEZ SUR UNE TOUCHE",
+        "KrypDeathScreen.Ready",
+        x + (w * 0.5),
+        y + (h * 0.66),
+        Config.TextColor or Color(255, 255, 255),
+        alpha * pulse,
+        TEXT_ALIGN_CENTER,
+        TEXT_ALIGN_CENTER
+    )
+end
 
-    -- Léger bandeau sombre derrière le titre.
-    local titleBoxW = w * 0.58
-    local titleBoxH = h * 0.27
-    local titleBoxX = x + (w - titleBoxW) * 0.5
-    local titleBoxY = y + h * 0.24
-    draw.RoundedBox(10, titleBoxX, titleBoxY, titleBoxW, titleBoxH, Color(0, 0, 0, 92 * alpha))
+local function drawDeathPanel(alpha, scaleAnimation, remaining)
+    local x, y, w, h = getPanelRect(scaleAnimation)
+    local radius = Config.PanelRadius or 18
 
-    draw.SimpleText(
-        Config.DeathTitle or "VOUS ÊTES MORT..",
+    drawSoftBox(x, y, w, h, radius, alpha)
+
+    drawGlowText(
+        Config.DeathTitle or "VOUS ÊTES MORT.",
         "KrypDeathScreen.Title",
-        x + w * 0.5,
-        y + h * 0.37,
-        withAlpha(accent, alpha),
+        x + (w * 0.5),
+        y + (h * 0.42),
+        Config.TextColor or Color(255, 255, 255),
+        alpha,
         TEXT_ALIGN_CENTER,
         TEXT_ALIGN_CENTER
     )
 
     if remaining > 0 then
-        drawCountdownLine(x + w * 0.5, y + h * 0.64, alpha, remaining)
+        drawRespawnLine(x, y, w, h, alpha, remaining)
     else
-        local pulse = 0.84 + math.sin(RealTime() * 5) * 0.10
-        draw.SimpleText(
-            Config.ReadyMessage or "APPUYEZ SUR UNE TOUCHE",
-            "KrypDeathScreen.Ready",
-            x + w * 0.5,
-            y + h * 0.64,
-            withAlpha(text, alpha * pulse),
-            TEXT_ALIGN_CENTER,
-            TEXT_ALIGN_CENTER
-        )
+        drawReadyLine(x, y, w, h, alpha)
     end
 
     draw.SimpleText(
         Config.CreditText or "Réalisateur : Kryp Studio",
         "KrypDeathScreen.Credit",
-        x + w - 14,
-        y + h - 10,
-        withAlpha(muted, alpha * 0.78),
-        TEXT_ALIGN_RIGHT,
+        x + (w * 0.5),
+        y + h - 18,
+        withAlpha(Config.MutedTextColor or Color(220, 220, 220), alpha * 0.85),
+        TEXT_ALIGN_CENTER,
         TEXT_ALIGN_BOTTOM
     )
 end
@@ -198,33 +252,35 @@ hook.Add("HUDPaint", "KrypDeathScreen.Draw", function()
     local alpha, scaleAnimation = getAnimation()
     if alpha <= 0 then return end
 
-    local bgAlpha = math.Clamp((Config.BackgroundAlpha or 212) * alpha, 0, 255)
-    surface.SetDrawColor(0, 0, 0, bgAlpha)
+    local backgroundAlpha = math.Clamp((Config.BackgroundAlpha or 235) * alpha, 0, 255)
+    surface.SetDrawColor(0, 0, 0, backgroundAlpha)
     surface.DrawRect(0, 0, ScrW(), ScrH())
 
-    -- Vignette simple, aucun cadre.
-    surface.SetDrawColor(0, 0, 0, 62 * alpha)
-    surface.DrawRect(0, 0, ScrW(), ScrH() * 0.16)
-    surface.DrawRect(0, ScrH() * 0.84, ScrW(), ScrH() * 0.16)
+    -- Assombrissement doux des bords
+    surface.SetDrawColor(0, 0, 0, 55 * alpha)
+    surface.DrawRect(0, 0, ScrW(), ScrH() * 0.18)
+    surface.DrawRect(0, ScrH() * 0.82, ScrW(), ScrH() * 0.18)
+    surface.DrawRect(0, 0, ScrW() * 0.10, ScrH())
+    surface.DrawRect(ScrW() * 0.90, 0, ScrW() * 0.10, ScrH())
 
     local remaining = math.max(0, math.ceil(state.readyAt - CurTime()))
-    drawDeathContent(alpha, scaleAnimation, remaining)
+    drawDeathPanel(alpha, scaleAnimation, remaining)
 end)
 
 hook.Add("RenderScreenspaceEffects", "KrypDeathScreen.WorldEffect", function()
     if not state.visible or not Config.EnableWorldEffect then return end
 
-    local alpha = select(1, getAnimation()) * (Config.WorldEffectStrength or 0.80)
+    local alpha = select(1, getAnimation()) * (Config.WorldEffectStrength or 0.82)
     if alpha <= 0 then return end
 
     DrawColorModify({
         ["$pp_colour_addr"] = 0,
         ["$pp_colour_addg"] = 0,
         ["$pp_colour_addb"] = 0,
-        ["$pp_colour_brightness"] = -0.070 * alpha,
-        ["$pp_colour_contrast"] = 1 - (0.15 * alpha),
-        ["$pp_colour_colour"] = 1 - (0.72 * alpha),
-        ["$pp_colour_mulr"] = 0.012 * alpha,
+        ["$pp_colour_brightness"] = -0.080 * alpha,
+        ["$pp_colour_contrast"] = 1 - (0.18 * alpha),
+        ["$pp_colour_colour"] = 1 - (0.82 * alpha),
+        ["$pp_colour_mulr"] = 0,
         ["$pp_colour_mulg"] = 0,
         ["$pp_colour_mulb"] = 0
     })
@@ -235,6 +291,7 @@ local function requestRespawn()
     if CurTime() < state.readyAt then return end
 
     state.requested = true
+
     net.Start(Net.Respawn)
     net.SendToServer()
 end
@@ -278,7 +335,7 @@ net.Receive(Net.Stop, function()
     state.leaving = true
     state.leaveAt = RealTime()
 
-    timer.Simple((Config.FadeOutDuration or 0.30) + 0.05, function()
+    timer.Simple((Config.FadeOutDuration or 0.32) + 0.05, function()
         if state.sequence ~= sequence then return end
 
         state.visible = false
